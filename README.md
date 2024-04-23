@@ -53,3 +53,5 @@ cmd_RelayDelay    - 8 (EEPROM 0x04)
 cmd_Delay             - 9 (следующие 2 байта за командой время 1..65535 сек)
 
 cmd_End                - 0xFF
+
+Фьюзы: BODLEVEL[2:0] = 101, RSTDISBL=0
