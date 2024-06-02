@@ -92,8 +92,8 @@ struct _EEPROM {
 	uint16_t	OffDelay;					// sec
 	uint8_t		RelaySwitchDelay;			// * 0.1 sec
 	uint8_t		_reserved[16-5];
-	CMD			cmds_1[EEPROM_cmds_size];	// ON cmds 1, [cmd_End], OFF cmd, [cmd_End]
-	CMD			cmds_2[EEPROM_cmds_size];	// ON cmds 2, [cmd_End], OFF cmd, [cmd_End]
+	CMD			cmds_1[EEPROM_cmds_size];	// start at 0x10: ON cmds 1, [cmd_End], OFF cmd, [cmd_End]
+	CMD			cmds_2[EEPROM_cmds_size];	// start at 0x70: ON cmds 2, [cmd_End], OFF cmd, [cmd_End]
 } __attribute__ ((packed));
 struct _EEPROM EEMEM EEPROM;
 
@@ -101,7 +101,7 @@ typedef enum {
 	W_OFF = 0,
 	W_ON_1  = 1,	// only in1 was active
 	W_ON_2  = 2,	// in2 was active
-	W_TURN_OFF = 3
+	W_TURN_OFF = 3	// need turn off
 } WORK;
 
 WORK	work						= W_OFF;
@@ -351,6 +351,9 @@ int main(void)
 							} else if(key1_press_on > 150) { // toggle button switched off
 								Switch_FAN(0);
 								LED1_OFF;
+								Delay100ms(2);
+								key1_pressed = 0;
+								key1_press_off = 0;
 								key1_press_on = 0;
 							} else if(!_is_dly) LED1_ON;
 						}
@@ -365,6 +368,7 @@ int main(void)
 			}
 		} else {
 			key1_pressed = 0;
+			key1_press_on = 0;
 		}
 		if(key1_repeat >= 4) { // 5 clicks - Setup delay -> 1 click = +1 minute to delay
 			ATOMIC_BLOCK(ATOMIC_FORCEON) OffDelay = 0;
